@@ -1,9 +1,7 @@
 import { Allow, Entity, Fields } from "remult";
 
 @Entity("tasks", {
-  allowApiCrud: Allow.authenticated,
-  allowApiInsert: "admin",
-  allowApiDelete: "admin",
+  allowApiCrud: true,
 })
 export class Task {
   @Fields.cuid()
@@ -13,7 +11,6 @@ export class Task {
     validate: (task) => {
       if (task.title.length < 3) throw "Too Short";
     },
-    allowApiUpdate: "admin",
   })
   title = "";
 

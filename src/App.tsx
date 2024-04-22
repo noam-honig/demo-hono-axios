@@ -1,26 +1,29 @@
-import { FormEvent, useEffect, useState } from "react"
-import { remult } from "remult"
-import { Task } from "./shared/Task"
-import { TasksController } from "./shared/TasksController"
+import { FormEvent, useEffect, useState } from "react";
+import { remult } from "remult";
+import { Task } from "./shared/Task";
+import { TasksController } from "./shared/TasksController";
+import axios from "axios";
 
-const taskRepo = remult.repo(Task)
+remult.apiClient.httpClient = axios;
+
+const taskRepo = remult.repo(Task);
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [newTaskTitle, setNewTaskTitle] = useState("")
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
 
   const addTask = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await taskRepo.insert({ title: newTaskTitle })
-      setNewTaskTitle("")
+      await taskRepo.insert({ title: newTaskTitle });
+      setNewTaskTitle("");
     } catch (error) {
-      alert((error as { message: string }).message)
+      alert((error as { message: string }).message);
     }
-  }
+  };
   const setAllCompleted = async (completed: boolean) => {
-    await TasksController.setAllCompleted(completed)
-  }
+    await TasksController.setAllCompleted(completed);
+  };
   useEffect(() => {
     return taskRepo
       .liveQuery({
@@ -28,8 +31,8 @@ export default function App() {
         orderBy: { createdAt: "asc" },
         //where: { completed: true },
       })
-      .subscribe((info) => setTasks(info.applyChanges))
-  }, [])
+      .subscribe((info) => setTasks(info.applyChanges));
+  }, []);
   return (
     <div>
       <h1>Todos</h1>
@@ -46,28 +49,28 @@ export default function App() {
         )}
         {tasks.map((task) => {
           const setTask = (value: Task) =>
-            setTasks((tasks) => tasks.map((t) => (t === task ? value : t)))
+            setTasks((tasks) => tasks.map((t) => (t === task ? value : t)));
 
           const setCompleted = async (completed: boolean) =>
-            await taskRepo.save({ ...task, completed })
+            await taskRepo.save({ ...task, completed });
 
-          const setTitle = (title: string) => setTask({ ...task, title })
+          const setTitle = (title: string) => setTask({ ...task, title });
 
           const saveTask = async () => {
             try {
-              await taskRepo.save(task)
+              await taskRepo.save(task);
             } catch (error) {
-              alert((error as { message: string }).message)
+              alert((error as { message: string }).message);
             }
-          }
+          };
           const deleteTask = async () => {
             try {
-              await taskRepo.delete(task)
-              setTasks(tasks.filter((t) => t !== task))
+              await taskRepo.delete(task);
+              setTasks(tasks.filter((t) => t !== task));
             } catch (error) {
-              alert((error as { message: string }).message)
+              alert((error as { message: string }).message);
             }
-          }
+          };
           return (
             <div key={task.id}>
               <input
@@ -84,7 +87,7 @@ export default function App() {
                 <button onClick={deleteTask}>Delete</button>
               )}
             </div>
-          )
+          );
         })}
 
         <div>
@@ -97,5 +100,5 @@ export default function App() {
         </div>
       </main>
     </div>
-  )
+  );
 }
